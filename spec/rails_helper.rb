@@ -28,7 +28,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # If you are not using ActiveRecord, you can remove these lines.
 # require database cleaner at the top level
 require 'database_cleaner'
-
+require 'rspec/rails'
 # [...]
 # configure shoulda matchers to use rspec as the test framework and full matcher libraries for rails
 Shoulda::Matchers.configure do |config|
@@ -39,11 +39,13 @@ Shoulda::Matchers.configure do |config|
 end
 
 # [...]
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 RSpec.configure do |config|
   # [...]
   # add `FactoryBot` methods
+  config.infer_spec_type_from_file_location!
   config.include FactoryBot::Syntax::Methods
-
+  config.include RequestSpecHelper, type: :request
   # start by truncating all the tables but then use the faster transaction strategy the rest of the time.
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
